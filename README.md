@@ -5,7 +5,7 @@
 <img src="https://github.com/archlinux/archinstall/raw/master/docs/logo.png" alt="drawing" width="200"/>
 </p>
 
-# Arcoinstall
+# Arcoinstall DEVELOPMENT
 
 # Create you own Arch Linux ISO with access to the ArcoLinux packages and configs
 
