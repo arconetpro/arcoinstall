@@ -4,7 +4,7 @@
 # Contributor: demostanis worlds <demostanis@protonmail.com>
 
 pkgname=arcoinstall
-pkgver=3.0.2
+pkgver=3.0.3
 pkgrel=1
 pkgdesc="Just another guided/automated Arch Linux installer with a twist"
 arch=(any)
