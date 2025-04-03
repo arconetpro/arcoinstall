@@ -1,12 +1,12 @@
 import shutil
-
 import archinstall
+
 from typing import TYPE_CHECKING, override
 
 from archinstall.default_profiles.desktops import SeatAccess
 from archinstall.default_profiles.profile import GreeterType, ProfileType, SelectResult
 from archinstall.default_profiles.xorg import XorgProfile
-from archinstall.lib.models import User
+from archinstall.lib.models.users import User
 from archinstall.default_profiles.desktops import SeatAccess
 from archinstall.tui import Alignment, FrameProperties, MenuItem, MenuItemGroup, ResultType, SelectMenu
 
@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 
 class HyprlandProfile(XorgProfile):
 	def __init__(self) -> None:
-		super().__init__('Hyprland', ProfileType.DesktopEnv, description='')
+		super().__init__('Hyprland', ProfileType.WindowMgr, description='')
 
 		self.custom_settings = {'seat_access': None}
 
@@ -126,6 +126,8 @@ class HyprlandProfile(XorgProfile):
 			'uwsm',
 			'waybar-git',
 			'xfce4-terminal',
+		] + [
+			'arcolinux-sddm-simplicity-git',
 		]
 
 	@property
@@ -165,9 +167,11 @@ class HyprlandProfile(XorgProfile):
 
 	@override
 	def post_install(self, install_session: 'Installer') -> None:
-		users: User | list[User] = archinstall.arguments.get('!users', [])
-		if not isinstance(users, list):
-			users = [users]
+		from archinstall.lib.args import arch_config_handler
+		users: list[User] | None = arch_config_handler.config.users
+
+		if not users:
+		    return
 
 		for user in users:
 			source = install_session.target / "etc" / "skel"

@@ -1,12 +1,12 @@
 import shutil
-
 import archinstall
+
 from typing import TYPE_CHECKING, override
 
 from archinstall.default_profiles.profile import GreeterType, ProfileType
 from archinstall.default_profiles.xorg import XorgProfile
-from archinstall.lib.models import User
 
+from archinstall.lib.models.users import User
 if TYPE_CHECKING:
 	from archinstall.lib.installer import Installer
 
@@ -108,13 +108,17 @@ class LxqtProfile(XorgProfile):
 			'xfce4-screenshooter',
 			'xfce4-taskmanager',
 			'xfce4-terminal',
+		] + [
+			'arcolinux-sddm-simplicity-git',
 		]
 
 	@override
 	def post_install(self, install_session: 'Installer') -> None:
-		users: User | list[User] = archinstall.arguments.get('!users', [])
-		if not isinstance(users, list):
-			users = [users]
+		from archinstall.lib.args import arch_config_handler
+		users: list[User] | None = arch_config_handler.config.users
+
+		if not users:
+		    return
 
 		for user in users:
 			source = install_session.target / "etc" / "skel"

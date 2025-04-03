@@ -4,7 +4,7 @@
 # Contributor: demostanis worlds <demostanis@protonmail.com>
 
 pkgname=arcoinstall
-pkgver=3.0.2.1
+pkgver=3.0.4.1
 pkgrel=1
 pkgdesc="Just another guided/automated Arch Linux installer with a twist"
 arch=(any)
@@ -54,7 +54,7 @@ b2sums=(SKIP)
 pkgver() {
   cd $pkgname-$pkgver
 
-  awk '$1 ~ /^__version__/ {gsub("\"", ""); print $3}' archinstall/__init__.py
+  echo $pkgver
 }
 
 prepare() {

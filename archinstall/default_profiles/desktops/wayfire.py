@@ -1,24 +1,14 @@
 import shutil
-
 import archinstall
+
 from typing import TYPE_CHECKING, override
 
-from archinstall.default_profiles.profile import GreeterType, ProfileType, SelectResult
+from archinstall.default_profiles.profile import GreeterType, ProfileType
 from archinstall.default_profiles.xorg import XorgProfile
-from archinstall.lib.models import User
-from archinstall.default_profiles.desktops import SeatAccess
-from archinstall.tui import Alignment, FrameProperties, MenuItem, MenuItemGroup, ResultType, SelectMenu
 
+from archinstall.lib.models.users import User
 if TYPE_CHECKING:
 	from archinstall.lib.installer import Installer
-
-
-if TYPE_CHECKING:
-	from collections.abc import Callable
-
-	from archinstall.lib.translationhandler import DeferredTranslation
-
-	_: Callable[[str], DeferredTranslation]
 
 
 class WayfireProfile(XorgProfile):
@@ -137,48 +127,17 @@ class WayfireProfile(XorgProfile):
 			'wf-shell-git',
 			'wl-clipboard',
 			'xfce4-terminal',
+		] + [
+			'arcolinux-sddm-simplicity-git',
 		]
-
-	@property
-	@override
-	def services(self) -> list[str]:
-		if pref := self.custom_settings.get('seat_access', None):
-			return [pref]
-		return []
-
-	def _ask_seat_access(self) -> None:
-		# need to activate seat service and add to seat group
-		header = str(_('Wayfire needs access to your seat (collection of hardware devices i.e. keyboard, mouse, etc)'))
-		header += '\n' + str(_('Choose an option to give Wayfire access to your hardware')) + '\n'
-
-		items = [MenuItem(s.value, value=s) for s in SeatAccess]
-		group = MenuItemGroup(items, sort_items=True)
-
-		default = self.custom_settings.get('seat_access', None)
-		group.set_default_by_value(default)
-
-		result = SelectMenu(
-			group,
-			header=header,
-			allow_skip=False,
-			frame=FrameProperties.min(str(_('Seat access'))),
-			alignment=Alignment.CENTER
-		).run()
-
-		if result.type_ == ResultType.Selection:
-			if result.item() is not None:
-				self.custom_settings['seat_access'] = result.get_value().value
-
-	@override
-	def do_on_select(self) -> SelectResult | None:
-		self._ask_seat_access()
-		return None
-
+		
 	@override
 	def post_install(self, install_session: 'Installer') -> None:
-		users: User | list[User] = archinstall.arguments.get('!users', [])
-		if not isinstance(users, list):
-			users = [users]
+		from archinstall.lib.args import arch_config_handler
+		users: list[User] | None = arch_config_handler.config.users
+
+		if not users:
+		    return
 
 		for user in users:
 			source = install_session.target / "etc" / "skel"
